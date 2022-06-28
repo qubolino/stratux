@@ -7,6 +7,13 @@ iface eth0 inet dhcp
 
 allow-hotplug wlan0
 
+# CAN Bus
+auto can0
+iface can0 inet manual
+pre-up /sbin/ip link set can0 type can bitrate 500000
+up /sbin/ifconfig can0 up
+down /sbin/ifconfig can0 down
+
 {{if or (eq .WiFiMode 0) (eq .WiFiMode 2)}}
 # AP or AP+Client -> create seperate ap0 virtual interface for the AP; optionally use wlan0 for client connection
 
