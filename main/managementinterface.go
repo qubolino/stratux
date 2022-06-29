@@ -256,6 +256,21 @@ func handleSituationWS(conn *websocket.Conn) {
 
 }
 
+func handleCanDataWS(conn *websocket.Conn) {
+	timer := time.NewTicker(100 * time.Millisecond)
+	for {
+		canDataJSON, _ := json.Marshal(&myCanData)
+		_, err := conn.Write(canDataJSON)
+
+		if err != nil {
+			break
+		}
+		<-timer.C
+
+	}
+
+}
+
 // AJAX call - /getStatus. Responds with current global status
 // a webservice call for the same data available on the websocket but when only a single update is needed
 func handleStatusRequest(w http.ResponseWriter, r *http.Request) {
@@ -271,6 +286,13 @@ func handleSituationRequest(w http.ResponseWriter, r *http.Request) {
 	setJSONHeaders(w)
 	situationJSON, _ := json.Marshal(&mySituation)
 	fmt.Fprintf(w, "%s\n", situationJSON)
+}
+
+func handleCanDataRequest(w http.ResponseWriter, r *http.Request) {
+	setNoCache(w)
+	setJSONHeaders(w)
+	canDataJSON, _ := json.Marshal(&myCanData)
+	fmt.Fprintf(w, "%s\n", canDataJSON)
 }
 
 // AJAX call - /getTowers. Responds with all ADS-B ground towers that have sent messages that we were able to parse, along with its stats.
@@ -1120,6 +1142,12 @@ func managementInterface() {
 				Handler: websocket.Handler(handleSituationWS)}
 			s.ServeHTTP(w, req)
 		})
+	http.HandleFunc("/candata",
+		func(w http.ResponseWriter, req *http.Request) {
+			s := websocket.Server{
+				Handler: websocket.Handler(handleCanDataWS)}
+			s.ServeHTTP(w, req)
+		})
 	http.HandleFunc("/weather",
 		func(w http.ResponseWriter, req *http.Request) {
 			s := websocket.Server{
@@ -1149,6 +1177,7 @@ func managementInterface() {
 
 	http.HandleFunc("/getStatus", handleStatusRequest)
 	http.HandleFunc("/getSituation", handleSituationRequest)
+	http.HandleFunc("/getCanData", handleCanDataRequest)
 	http.HandleFunc("/getTowers", handleTowersRequest)
 	http.HandleFunc("/getSatellites", handleSatellitesRequest)
 	http.HandleFunc("/getSettings", handleSettingsGetRequest)

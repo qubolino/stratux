@@ -181,6 +181,9 @@ var Crc16Table [256]uint16
 // Current AHRS, pressure altitude, etc.
 var mySituation SituationData
 
+// Current CAN data
+var myCanData CanData
+
 type WriteCloser interface {
 	io.Writer
 	io.Closer
@@ -1727,6 +1730,9 @@ func main() {
 
 	// Start the GPS external sensor monitoring.
 	initGPS()
+
+	// Start the CanBus
+	go listenToCanBus()
 
 	// Start the heartbeat message loop in the background, once per second.
 	go heartBeatSender()
