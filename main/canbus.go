@@ -29,8 +29,13 @@ func listenToCanBus() {
 
 	iface, err := net.InterfaceByName("can0")
 
-	if err != nil {
-		log.Fatalf("Could not find network interface %s (%v)", "can0", err)
+	for {
+		if err != nil { // Local connection failed.
+			log.Println("could not find interface can0")
+			time.Sleep(30 * time.Second)
+		} else {
+			break
+		}
 	}
 
 	conn, err := can.NewReadWriteCloserForInterface(iface)
