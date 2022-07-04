@@ -14,6 +14,10 @@ pre-up /sbin/ip link set can0 type can bitrate 500000
 up /sbin/ifconfig can0 up
 down /sbin/ifconfig can0 down
 
+# USB 4G dongle
+auto usb0
+allow-hotplug usb0
+iface usb0 inet dhcp
 
 # AP or AP+Client -> create seperate ap0 virtual interface for the AP; optionally use wlan0 for client connection
 iface ap0 inet static
